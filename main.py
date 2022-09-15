@@ -1,10 +1,25 @@
 import boto3
-from boto3.dynamodb.conditions import Key
+
+TABLE = "plotsV2"
 
 
-def get_item(key: str, table: str = "plotsV2"):
+def put_item(key: str, value) -> None:
     dynamodb = boto3.resource("dynamodb")
-    table = dynamodb.Table(table)
+    table = dynamodb.Table(TABLE)
+    # NOTE if you want to support floats add this probably, untested
+    # x = json.loads(json.dumps(cartBefore), parse_float=Decimal)
+    response = table.put_item(
+        Item={
+            "key": key,
+            "value": value,
+        }
+    )
+    assert response["ResponseMetadata"]["HTTPStatusCode"] == 200
+
+
+def get_item(key: str):
+    dynamodb = boto3.resource("dynamodb")
+    table = dynamodb.Table(TABLE)
     response = table.get_item(
         Key={
             "key": key,
@@ -13,4 +28,6 @@ def get_item(key: str, table: str = "plotsV2"):
     return response["Item"]["value"]
 
 
-x = get_item("jira")
+put_item("test5", 42)
+x = get_item("test5")
+print(x)
